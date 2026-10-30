@@ -31,6 +31,16 @@ TRAE 沙箱拦截 `C:\ProgramData\NVIDIA Corporation\Drs\nvAppTimestamps`，报 
 **对策**：agent 跑涉及 onnxruntime 的命令时必须 `dangerouslyDisableSandbox: true`。用户在自己终端跑没有这个问题。
 **教训**：曾误判为"环境坏了"，先后装了 MSVC Redistributable（这个确实需要，见下）和 Docker Desktop（**多余**，沙箱问题 Docker 解决不了）。排查顺序应是：先区分"沙箱拦截" vs "真环境缺失"，再动手装东西。
 
+## GitHub 推送踩坑（2026-10-30）
+
+仓库：`https://github.com/Amywenz/AI-.git`，分支 `main`。
+**现象**：`git push` 报 `SSL certificate problem: unable to get local issuer certificate`。
+**根因**：本机 `hosts` 把所有 `github.com` / `*.githubusercontent.com` 域名指向 `127.0.0.1`，由 Steam++（Watt Toolkit，BeyondDimension）在本地 443 端口做 HTTPS 加速，使用自签 CA「SteamTools Certificate」（已装入系统根存储）。git 用 OpenSSL 后端 + 自带 `ca-bundle.crt`，不认这个 CA。
+**解法**：导出该 CA 为 PEM，追加到 `D:\Git\mingw64\etc\ssl\certs\ca-bundle.crt`（原文件备份为同目录 `.bak`）。之后 `git ls-remote` / `push` 正常。
+**注意**：git 升级可能重置该文件，重装 Git 后若再报证书错误，按同样步骤重新追加。
+
+**仓库内容约定**：`.gitignore` 排除 `.venv/`、`models/rmbg/onnx/model.onnx`（168MB 超 GitHub 100MB 单文件限制）、`_ort_probe/`、`vc_redist.x64.exe`、`uploads/`、`static/outputs/`、`results/`、编辑器目录。模型需自行从 HuggingFace `briaai/RMBG-1.4` 下载到 `models/rmbg/onnx/model.onnx`（README 已说明）。
+
 ## 技术栈实测版本（2026-09-22）
 
 `.venv`（Python 3.13.15）实测安装：
