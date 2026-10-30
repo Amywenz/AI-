@@ -1,0 +1,29 @@
+# 虚拟环境（容器内独立装依赖）
+.venv
+_ort_probe311
+
+# Python 缓存
+__pycache__
+*.pyc
+*.pyo
+
+# IDE / 工具元数据
+.idea
+.specstory
+.cursorindexingignore
+.git
+.gitignore
+
+# 项目文档（不入镜像）
+AGENTS.md
+MEMORY.md
+
+# 模型 176MB 通过 volume 挂载，不进镜像
+models
+
+# 运行时目录（通过 volume 持久化）
+uploads
+static/outputs
+
+# 测试素材（不需要部署）
+home
